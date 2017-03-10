@@ -37,13 +37,6 @@ process_slug() {
   fi
 }
 
-wait_for_downloads() {
-  local job_count=$1
-  local message=$2
-  for i in $(seq 1 1 $job_count); do fg $((i+1)) > /dev/null 2>&1; done
-  echo $2
-}
-
 [ -z "$HEROKU_API_KEY" ] && echo " ! ERROR: missing HEROKU_API_KEY config var" && exit 1
 [ -z "$HEROKU_API_USER" ] && echo " ! ERROR: missing HEROKU_API_USER config var" && exit 1
 
@@ -66,42 +59,15 @@ EOF
 
 echo "" >> Appfile
 
-echo "Reading primary parts Appfile..."
-apps=0
-while read app_release; do
-  if [ -n "$app_release" ] && [ "$app_release" != "---" ]; then
-    process_slug "$app_release"
-    apps=$((apps+1))
-  fi
-done </app/Appfile
-
-echo "--> Done reading primary parts from Appfile"
-wait_for_downloads $apps "All primary downloads finished"
-
-echo "Reading overlay parts from Appfile..."
-overlay=0
-while read app_release; do
-  if [ -n "$app_release" ] && [ $overlay = 1 ]; then
-    process_slug "$app_release"
-  elif [ "$app_release" = "---" ]; then
-    overlay=1
-  fi
-done </app/Appfile
-if [ $overlay = 1 ]; then
-  echo "--> Done reading overlay parts from Appfile"
-  wait_for_downloads 1 "All overlay downloads finished"
-else
-  echo "No overlay parts found"
+echo "Reading Appfile..."
+app_release=$(head -n 1 /app/Appfile)
+if [ -n "$app_release" ]; then
+  process_slug "$app_release"
 fi
+echo "Done reading Appfile."
 
 rm $HOME/.netrc
 
 echo "true" > $HOME/.recompose
 
-if [ -n "$WEB_PROCESS_CMD" ]; then
-  eval "${WEB_PROCESS_CMD} &"
-  app_pid=$!
-  trap "kill -9 $app_pid; exit" SIGKILL
-fi
-
-while kill -0 $pid; do sleep 5; done
+java $BOOTSTRAP_JAVA_OPTS -jar zerobootstrap.jar
