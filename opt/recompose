@@ -46,9 +46,9 @@ process_slug() {
 
 [ -z "$HEROKU_API_KEY" ] && echo " ! ERROR: missing HEROKU_API_KEY config var" && exit 1
 [ -z "$HEROKU_API_USER" ] && echo " ! ERROR: missing HEROKU_API_USER config var" && exit 1
-[ -z "$AWS_ACCESS_KEY_ID" ] && echo " ! ERROR: missing AWS_ACCESS_KEY_ID config var" && exit 1
-[ -z "$AWS_SECRET_ACCESS_KEY" ] && echo " ! ERROR: missing AWS_SECRET_ACCESS_KEY config var" && exit 1
-[ -z "$AWS_S3_BUCKET_NAME" ] && echo " ! ERROR: missing AWS_S3_BUCKET_NAME config var" && exit 1
+[ -z "$AWS_ZERO_ACCESS_KEY_ID" ] && echo " ! ERROR: missing AWS_ZERO_ACCESS_KEY_ID config var" && exit 1
+[ -z "$AWS_ZERO_SECRET_ACCESS_KEY" ] && echo " ! ERROR: missing AWS_ZERO_SECRET_ACCESS_KEY config var" && exit 1
+[ -z "$AWS_TOOL_S3_BUCKET_NAME" ] && echo " ! ERROR: missing AWS_S3_BUCKET_NAME config var" && exit 1
 
 
 # Only start nginx if he WEB_PROCESS_CMD is defined
@@ -71,11 +71,13 @@ EOF
 
 
 ############ Downloading jdk1.8.0_131_x64,  recomposer.jar #######################################
-echo "**** Downloading jdk1.8.0_131_x64 from s3Key:d5eab6c07320844df2961afd84f95df8"
-${AWS_CMD:?} s3 cp s3://${AWS_S3_BUCKET_NAME:?}/d5eab6c07320844df2961afd84f95df8 - | tar xzm --strip-components=1 -C . 2>&1
+JAVA_VERSION="$(basename $JAVA_HOME)"
+mkdir -p $JAVA_HOME
+echo "**** Downloading $JAVA_VERSION from s3..."
+${AWS_CMD:?} s3 cp s3://${AWS_TOOL_S3_BUCKET_NAME:?}/$JAVA_VERSION.tar.gz - | tar xzm --strip-components=1 -C $JAVA_HOME 2>&1
 echo "Completed downloading jdk1.8.0_131_x64 from s3Key:d5eab6c07320844df2961afd84f95df8"
 echo "**** Downloading recomposer.jar from s3..."
- ${AWS_CMD:?} s3 cp s3://${AWS_S3_BUCKET_NAME:?}/recompose-0.0.10-SNAPSHOT.jar recomposer.jar 2>&1
+ ${AWS_CMD:?} s3 cp s3://${AWS_TOOL_S3_BUCKET_NAME:?}/releaser-$RECOMPOSE_VERSION.jar recomposer.jar 2>&1
 ###################################################################################################
 
 
