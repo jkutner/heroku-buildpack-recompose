@@ -46,8 +46,8 @@ process_slug() {
 
 [ -z "$HEROKU_API_KEY" ] && echo " ! ERROR: missing HEROKU_API_KEY config var" && exit 1
 [ -z "$HEROKU_API_USER" ] && echo " ! ERROR: missing HEROKU_API_USER config var" && exit 1
-[ -z "$AWS_ZERO_ACCESS_KEY_ID" ] && echo " ! ERROR: missing AWS_ZERO_ACCESS_KEY_ID config var" && exit 1
-[ -z "$AWS_ZERO_SECRET_ACCESS_KEY" ] && echo " ! ERROR: missing AWS_ZERO_SECRET_ACCESS_KEY config var" && exit 1
+[ -z "$AWS_ACCESS_KEY_ID" ] && echo " ! ERROR: missing AWS_ACCESS_KEY_ID config var" && exit 1
+[ -z "$AWS_SECRET_ACCESS_KEY" ] && echo " ! ERROR: missing AWS_SECRET_ACCESS_KEY config var" && exit 1
 [ -z "$AWS_TOOL_S3_BUCKET_NAME" ] && echo " ! ERROR: missing AWS_S3_BUCKET_NAME config var" && exit 1
 
 
